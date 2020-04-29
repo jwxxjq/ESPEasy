@@ -437,10 +437,8 @@ boolean MQTTConnect_037()
   {
     String log = "";
 
-    if (hasControllerCredentialsSet(enabledMqttController, ControllerSettings))
-      result = MQTTclient_037->connect(clientid.c_str(), 
-                                      getControllerUser(enabledMqttController, ControllerSettings).c_str(), 
-                                      getControllerPass(enabledMqttController, ControllerSettings).c_str());
+    if ((SecuritySettings.ControllerUser[enabledMqttController][0] != 0) && (SecuritySettings.ControllerPassword[enabledMqttController][0] != 0))
+      result = MQTTclient_037->connect(clientid.c_str(), SecuritySettings.ControllerUser[enabledMqttController], SecuritySettings.ControllerPassword[enabledMqttController]);
     else
       result = MQTTclient_037->connect(clientid.c_str());
 

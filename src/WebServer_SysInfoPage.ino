@@ -434,7 +434,10 @@ void handle_sysinfo_Firmware() {
       addHtml(F("passed."));
     }
   }
-  addRowLabelValue_copy(LabelType::BUILD_TIME);
+  addRowLabel_copy(getLabel(LabelType::BUILD_TIME));
+  addHtml(String(CRCValues.compileDate));
+  addHtml(" ");
+  addHtml(String(CRCValues.compileTime));
 
   addRowLabel_copy(getLabel(LabelType::BINARY_FILENAME));
 
@@ -578,6 +581,7 @@ void handle_sysinfo_Storage() {
     addHtml(html);
   }
 
+  # if defined(ESP8266)
   {
     // FIXME TD-er: Must also add this for ESP32.
     addRowLabel(getLabel(LabelType::SKETCH_SIZE));
@@ -593,10 +597,8 @@ void handle_sysinfo_Storage() {
 
     uint32_t maxSketchSize;
     bool     use2step;
-    # if defined(ESP8266)
-    bool     otaEnabled = 
-    #endif
-      OTA_possible(maxSketchSize, use2step);
+    bool     otaEnabled = OTA_possible(maxSketchSize, use2step);
+
     addRowLabel(getLabel(LabelType::MAX_OTA_SKETCH_SIZE));
     {
       String html;
@@ -609,15 +611,13 @@ void handle_sysinfo_Storage() {
       addHtml(html);
     }
 
-    # if defined(ESP8266)
     addRowLabel(getLabel(LabelType::OTA_POSSIBLE));
     addHtml(boolToString(otaEnabled));
 
     addRowLabel(getLabel(LabelType::OTA_2STEP));
     addHtml(boolToString(use2step));
-    # endif // if defined(ESP8266)
-
   }
+  # endif // if defined(ESP8266)
 
   addRowLabel(getLabel(LabelType::SPIFFS_SIZE));
   {
@@ -665,12 +665,10 @@ void handle_sysinfo_Storage() {
     html_TD();
     addHtml(F("(offset / size per item / index)"));
 
-    for (int st = 0; st < SettingsType::SettingsType_MAX; ++st) {
-      SettingsType::Enum settingsType = static_cast<SettingsType::Enum>(st);
+    for (int st = 0; st < SettingsType_MAX; ++st) {
+      SettingsType settingsType = static_cast<SettingsType>(st);
       html_TR_TD();
-      addHtml(SettingsType::getSettingsTypeString(settingsType));
-      html_BR();
-      addHtml(SettingsType::getSettingsFileName(settingsType));
+      addHtml(getSettingsTypeString(settingsType));
       html_TD();
       getStorageTableSVG(settingsType);
     }

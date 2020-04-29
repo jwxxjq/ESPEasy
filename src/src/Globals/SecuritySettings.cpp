@@ -2,4 +2,3 @@
 
 
 SecurityStruct SecuritySettings;
-ExtendedControllerCredentialsStruct ExtendedControllerCredentials;

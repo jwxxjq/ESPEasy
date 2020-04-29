@@ -5,8 +5,6 @@
 #include <BalluHeatpumpIR.h>
 #include <CarrierHeatpumpIR.h>
 #include <DaikinHeatpumpIR.h>
-#include <DaikinHeatpumpARC417IR.h>
-#include <DaikinHeatpumpARC480A14IR.h>
 #include <FuegoHeatpumpIR.h>
 #include <FujitsuHeatpumpIR.h>
 #include <GreeHeatpumpIR.h>

@@ -105,7 +105,7 @@ bool do_process_c003_delay_queue(int controller_number, const C003_queue_element
   }
 
   addLog(LOG_LEVEL_DEBUG, F("TELNT: Sending pw"));
-  client.println(getControllerPass(element.controller_idx, ControllerSettings));
+  client.println(SecuritySettings.ControllerPassword[element.controller_idx]);
   delay(100);
   while (client_available(client))
     client.read();

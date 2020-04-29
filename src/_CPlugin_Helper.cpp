@@ -100,15 +100,16 @@ String get_auth_header(const String& user, const String& pass) {
   return authHeader;
 }
 
-String get_auth_header(int controller_index, const ControllerSettingsStruct& ControllerSettings) {
+String get_auth_header(int controller_index) {
   String authHeader = "";
 
   if (validControllerIndex(controller_index)) {
-    if (hasControllerCredentialsSet(controller_index, ControllerSettings))
+    if ((SecuritySettings.ControllerUser[controller_index][0] != 0) &&
+        (SecuritySettings.ControllerPassword[controller_index][0] != 0))
     {
       authHeader = get_auth_header(
-        getControllerUser(controller_index, ControllerSettings),
-        getControllerPass(controller_index, ControllerSettings));
+        String(SecuritySettings.ControllerUser[controller_index]),
+        String(SecuritySettings.ControllerPassword[controller_index]));
     }
   } else {
     addLog(LOG_LEVEL_ERROR, F("Invalid controller index"));
@@ -214,7 +215,7 @@ String create_http_request_auth(
     defaultport ? ControllerSettings.getHost() : ControllerSettings.getHostPortString(),
     method,
     uri,
-    get_auth_header(controller_index, ControllerSettings),
+    get_auth_header(controller_index),
     "", // additional_options
     content_length);
 }
@@ -426,49 +427,4 @@ bool send_via_http(const String& logIdentifier, WiFiClient& client, const String
 
 bool send_via_http(int controller_number, WiFiClient& client, const String& postStr, bool must_check_reply) {
   return send_via_http(get_formatted_Controller_number(controller_number), client, postStr, must_check_reply);
-}
-
-
-String getControllerUser(controllerIndex_t controller_idx, const ControllerSettingsStruct& ControllerSettings)
-{
-  if (!validControllerIndex(controller_idx)) return "";
-  if (ControllerSettings.useExtendedCredentials()) {
-    return ExtendedControllerCredentials.getControllerUser(controller_idx);
-  }
-  return SecuritySettings.ControllerUser[controller_idx];
-}
-
-String getControllerPass(controllerIndex_t controller_idx, const ControllerSettingsStruct& ControllerSettings)
-{
-  if (!validControllerIndex(controller_idx)) return "";
-  if (ControllerSettings.useExtendedCredentials()) {
-    return ExtendedControllerCredentials.getControllerPass(controller_idx);
-  }
-  return SecuritySettings.ControllerPassword[controller_idx];
-}
-
-void setControllerUser(controllerIndex_t controller_idx, const ControllerSettingsStruct& ControllerSettings, const String& value)
-{
-  if (!validControllerIndex(controller_idx)) return;
-  if (ControllerSettings.useExtendedCredentials()) {
-    ExtendedControllerCredentials.setControllerUser(controller_idx, value);
-  } else {
-    safe_strncpy(SecuritySettings.ControllerUser[controller_idx], value, sizeof(SecuritySettings.ControllerUser[0]));
-  }
-}
-
-void setControllerPass(controllerIndex_t controller_idx, const ControllerSettingsStruct& ControllerSettings, const String& value)
-{
-  if (!validControllerIndex(controller_idx)) return;
-  if (ControllerSettings.useExtendedCredentials()) {
-    ExtendedControllerCredentials.setControllerPass(controller_idx, value);
-  } else {
-    safe_strncpy(SecuritySettings.ControllerPassword[controller_idx], value, sizeof(SecuritySettings.ControllerPassword[0]));
-  }
-}
-
-bool hasControllerCredentialsSet(controllerIndex_t controller_idx, const ControllerSettingsStruct& ControllerSettings)
-{
-  return getControllerUser(controller_idx, ControllerSettings).length() != 0 &&
-         getControllerPass(controller_idx, ControllerSettings).length() != 0;
 }

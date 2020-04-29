@@ -10,19 +10,18 @@
 /*********************************************************************************************\
  * SettingsStruct
 \*********************************************************************************************/
-template<unsigned int N_TASKS>
+template <unsigned int N_TASKS>
 class SettingsStruct_tmpl
 {
   public:
-
   SettingsStruct_tmpl();
 
   // VariousBits1 defaults to 0, keep in mind when adding bit lookups.
   bool appendUnitToHostname() const;
   void appendUnitToHostname(bool value);
 
-  bool uniqueMQTTclientIdReconnect_unused() const;
-  void uniqueMQTTclientIdReconnect_unused(bool value);
+  bool uniqueMQTTclientIdReconnect() const;
+  void uniqueMQTTclientIdReconnect(bool value);
 
   bool OldRulesEngine() const;
   void OldRulesEngine(bool value);
@@ -107,7 +106,7 @@ class SettingsStruct_tmpl
   byte          WebLogLevel;
   byte          SDLogLevel;
   unsigned long BaudRate;
-  unsigned long MessageDelay_unused;  // MQTT settings now moved to the controller settings.
+  unsigned long MessageDelay;
   byte          deepSleep_wakeTime;   // 0 = Sleep Disabled, else time awake from sleep in seconds
   boolean       CustomCSS;
   boolean       DST;
@@ -120,7 +119,7 @@ class SettingsStruct_tmpl
   boolean       GlobalSync;
   unsigned long ConnectionFailuresThreshold;
   int16_t       TimeZone;
-  boolean       MQTTRetainFlag_unused;
+  boolean       MQTTRetainFlag;
   boolean       InitSPI;
   // FIXME TD-er: Must change to cpluginID_t, but then also another check must be added since changing the pluginID_t will also render settings incompatible
   byte          Protocol[CONTROLLER_MAX];
@@ -161,7 +160,7 @@ class SettingsStruct_tmpl
   int8_t        Pin_Reset;
   byte          SyslogFacility;
   uint32_t      StructSize;  // Forced to be 32 bit, to make sure alignment is clear.
-  boolean       MQTTUseUnitNameAsClientId_unused;
+  boolean       MQTTUseUnitNameAsClientId;
 
   //its safe to extend this struct, up to several bytes, default values in config are 0
   //look in misc.ino how config.dat is used because also other stuff is stored in it at different offsets.
