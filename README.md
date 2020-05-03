@@ -1,4 +1,4 @@
-本项目为ESPEasy self build branch：https://github.com/letscontrolit/ESPEasy/releases/latest
+本项目为ESPEasy self build version，branch from：https://github.com/letscontrolit/ESPEasy/releases/latest
 
 主要目的：
 

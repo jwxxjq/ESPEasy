@@ -750,13 +750,14 @@ To create/register a plugin, you have to :
 //    #define USES_P049   // MHZ19
 
 //    #define USES_P052   // SenseAir
-    #define USES_P053   // PMSx003
+//    #define USES_P053   // PMSx003
 //    #define USES_P056   // SDS011-Dust
 //    #define USES_P059   // Encoder
 
 //    #define USES_P063   // TTP229_KeyPad
 //    #define USES_P073   // 7DG
 //    #define USES_P079   // Wemos Motoshield
+    #define USES_P95    // custom sensor
 #endif
 
 
