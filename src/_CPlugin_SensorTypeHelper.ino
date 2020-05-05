@@ -29,6 +29,10 @@ byte getValueCountFromSensorType(byte sensorType)
       return 4;
     case SENSOR_TYPE_STRING:  // String type data stored in the event->String2
       return 1;
+    case SENSOR_TYPE_HEXA:
+      return 6;
+    case SENSOR_TYPE_PENTA:
+      return 5;
   }
   addLog(LOG_LEVEL_ERROR, F("getValueCountFromSensorType: Unknown sensortype"));
   return 0;
@@ -43,6 +47,8 @@ String getSensorTypeLabel(byte sensorType) {
     case SENSOR_TYPE_DUAL:             return F("Dual");
     case SENSOR_TYPE_TRIPLE:           return F("Triple");
     case SENSOR_TYPE_QUAD:             return F("Quad");
+    case SENSOR_TYPE_PENTA:            return F("Penta");
+    case SENSOR_TYPE_HEXA:             return F("Hexa");
     case SENSOR_TYPE_SWITCH:           return F("Switch");
     case SENSOR_TYPE_DIMMER:           return F("Dimmer");
     case SENSOR_TYPE_LONG:             return F("Long");
@@ -54,7 +60,7 @@ String getSensorTypeLabel(byte sensorType) {
 
 void sensorTypeHelper_webformLoad_allTypes(struct EventStruct *event, byte pconfigIndex)
 {
-  byte optionValues[12];
+  byte optionValues[14];
 
   optionValues[0]  = SENSOR_TYPE_SINGLE;
   optionValues[1]  = SENSOR_TYPE_TEMP_HUM;
@@ -68,7 +74,9 @@ void sensorTypeHelper_webformLoad_allTypes(struct EventStruct *event, byte pconf
   optionValues[9]  = SENSOR_TYPE_LONG;
   optionValues[10] = SENSOR_TYPE_WIND;
   optionValues[11] = SENSOR_TYPE_STRING;
-  sensorTypeHelper_webformLoad(event, pconfigIndex, 11, optionValues);
+  optionValues[12] = SENSOR_TYPE_PENTA;
+  optionValues[13] = SENSOR_TYPE_HEXA;
+  sensorTypeHelper_webformLoad(event, pconfigIndex, 13, optionValues);
 }
 
 void sensorTypeHelper_webformLoad_header()
@@ -80,12 +88,14 @@ void sensorTypeHelper_webformLoad_simple(struct EventStruct *event, byte pconfig
 {
   sensorTypeHelper_webformLoad_header();
 
-  byte optionValues[4];
+  byte optionValues[6];
   optionValues[0] = SENSOR_TYPE_SINGLE;
   optionValues[1] = SENSOR_TYPE_DUAL;
   optionValues[2] = SENSOR_TYPE_TRIPLE;
   optionValues[3] = SENSOR_TYPE_QUAD;
-  sensorTypeHelper_webformLoad(event, pconfigIndex, 4, optionValues);
+  optionValues[4] = SENSOR_TYPE_PENTA;
+  optionValues[5] = SENSOR_TYPE_HEXA;
+  sensorTypeHelper_webformLoad(event, pconfigIndex, 6, optionValues);
 }
 
 void sensorTypeHelper_webformLoad(struct EventStruct *event, byte pconfigIndex, int optionCount, const byte options[])

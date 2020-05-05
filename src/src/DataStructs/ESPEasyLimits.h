@@ -44,7 +44,8 @@
   #define NOTIFICATION_MAX                    3 // max 4!
 #endif
 #ifndef VARS_PER_TASK
-  #define VARS_PER_TASK                       4
+//  #define VARS_PER_TASK                       4
+  #define VARS_PER_TASK                       6
 #endif
 #ifndef PLUGIN_CONFIGVAR_MAX
   #define PLUGIN_CONFIGVAR_MAX                8

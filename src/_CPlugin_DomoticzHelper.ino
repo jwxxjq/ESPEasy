@@ -119,6 +119,21 @@ String formatDomoticzSensorType(struct EventStruct *event) {
       values += formatUserVarDomoticz(event, 2);
       values += formatUserVarDomoticz(event, 3);
       break;
+    case SENSOR_TYPE_PENTA:
+      values  = formatUserVarDomoticz(event, 0);
+      values += formatUserVarDomoticz(event, 1);
+      values += formatUserVarDomoticz(event, 2);
+      values += formatUserVarDomoticz(event, 3);
+      values += formatUserVarDomoticz(event, 4);
+      break;
+    case SENSOR_TYPE_HEXA:
+      values  = formatUserVarDomoticz(event, 0);
+      values += formatUserVarDomoticz(event, 1);
+      values += formatUserVarDomoticz(event, 2);
+      values += formatUserVarDomoticz(event, 3);
+      values += formatUserVarDomoticz(event, 4);
+      values += formatUserVarDomoticz(event, 5);
+      break;
     case SENSOR_TYPE_WIND:
 
       // WindDir in degrees; WindDir as text; Wind speed average ; Wind speed gust; 0

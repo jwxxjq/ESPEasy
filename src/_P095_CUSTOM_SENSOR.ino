@@ -35,7 +35,7 @@
 
 #define PLUGIN_095
 #define PLUGIN_ID_095 95
-#define PLUGIN_NAME_095 "Environment - custom_uart"
+#define PLUGIN_NAME_095 "Environment - custom_sensor"
 #define PLUGIN_VALUENAME1_095 "PM2.5"
 #define PLUGIN_VALUENAME2_095 "PM10"
 #define PLUGIN_VALUENAME3_095 "CO2"
@@ -131,22 +131,20 @@ boolean Plugin_095_process_data(struct EventStruct *event) {
   for (int i = 0; i < CUSTOM_SENSOR_VALUE_COUNT; i++)
     SerialRead16(&data[i], &checksum);
 
-  if (loglevelActiveFor(LOG_LEVEL_DEBUG)) {
-    String log = F("CUSTOM SENSOR : PM2.5=");
-    log += data[0];
-    log += F(", PM10=");
-    log += data[1];
-    log += F(", CO2=");
-    log += data[2];
-    log += F(", HCHO=");
-    log += data[3];
-    log += F(", Temperature=");
-    log += data[4]/10.0;
-    log += F(" ℃, Humidity=");
-    log += data[5]/10.0;
-    log += F(" %");
-    addLog(LOG_LEVEL_DEBUG, log);
-  }
+  String log = F("CUSTOM SENSOR : PM2.5=");
+  log += data[0];
+  log += F(", PM10=");
+  log += data[1];
+  log += F(", CO2=");
+  log += data[2];
+  log += F(", HCHO=");
+  log += data[3];
+  log += F(", Temperature=");
+  log += data[4]/10.0;
+  log += F(" ℃, Humidity=");
+  log += data[5]/10.0;
+  log += F(" %");
+  addLog(LOG_LEVEL_INFO, log);
 /*
   if (loglevelActiveFor(LOG_LEVEL_DEBUG_MORE)) {
     String log = F("PMSx003 : count/0.1L : 0.3um=");
@@ -192,7 +190,8 @@ boolean Plugin_095(byte function, struct EventStruct *event, String& string)
       {
         Device[++deviceCount].Number = PLUGIN_ID_095;
         Device[deviceCount].Type = DEVICE_TYPE_SERIAL_PLUS1; //DEVICE_TYPE_TRIPLE //change to triple if you want to use soft serial port, otherwise default using HW serial
-        Device[deviceCount].VType = SENSOR_TYPE_TRIPLE;
+                                                              //also the init part below needs to changed, too
+        Device[deviceCount].VType = SENSOR_TYPE_HEXA;
         Device[deviceCount].Ports = 0;
         Device[deviceCount].PullUpOption = false;
         Device[deviceCount].InverseLogicOption = false;

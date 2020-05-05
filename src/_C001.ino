@@ -74,6 +74,8 @@ bool CPlugin_001(CPlugin::Function function, struct EventStruct *event, String& 
             case SENSOR_TYPE_DUAL:
             case SENSOR_TYPE_TRIPLE:
             case SENSOR_TYPE_QUAD:
+            case SENSOR_TYPE_PENTA:
+            case SENSOR_TYPE_HEXA:
             case SENSOR_TYPE_TEMP_HUM:
             case SENSOR_TYPE_TEMP_BARO:
             case SENSOR_TYPE_TEMP_EMPTY_BARO:

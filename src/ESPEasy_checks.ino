@@ -38,7 +38,8 @@ void run_compiletime_checks() {
   check_size<SettingsStruct,                        SettingsStructSize>();
   check_size<ControllerSettingsStruct,              752u>();
   check_size<NotificationSettingsStruct,            996u>();
-  check_size<ExtraTaskSettingsStruct,               472u>();
+  check_size<ExtraTaskSettingsStruct,               640u>();
+//  check_size<ExtraTaskSettingsStruct,               472u>();
   check_size<EventStruct,                           96u>(); // Is not stored
 
   // LogStruct is mainly dependent on the number of lines.
