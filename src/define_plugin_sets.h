@@ -698,7 +698,7 @@ To create/register a plugin, you have to :
     #define USE_SERVO
 
     #define USES_P001   // Switch
-//    #define USES_P002   // ADC
+    #define USES_P002   // ADC
 //    #define USES_P003   // Pulse
 //    #define USES_P004   // Dallas
     #define USES_P005   // DHT
@@ -733,7 +733,7 @@ To create/register a plugin, you have to :
 //    #define USES_P031   // SHT1X
 //    #define USES_P032   // MS5611
 //    #define USES_P033   // Dummy
-//    #define USES_P034   // DHT12
+    #define USES_P034   // DHT12
 //    #define USES_P035   // IRTX
 //    #define USES_P036   // FrameOLED
 //    #define USES_P037   // MQTTImport
@@ -750,14 +750,14 @@ To create/register a plugin, you have to :
 //    #define USES_P049   // MHZ19
 
 //    #define USES_P052   // SenseAir
-//    #define USES_P053   // PMSx003
+    #define USES_P053   // PMSx003
 //    #define USES_P056   // SDS011-Dust
 //    #define USES_P059   // Encoder
 
 //    #define USES_P063   // TTP229_KeyPad
 //    #define USES_P073   // 7DG
 //    #define USES_P079   // Wemos Motoshield
-    #define USES_P95    // custom sensor
+    #define USES_P200    // custom sensor
 #endif
 
 

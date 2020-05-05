@@ -1,6 +1,6 @@
-//#ifdef USES_P095
+#ifdef USES_P200
 //#######################################################################################################
-//############################## Plugin 095: Plantower custom sensor ####################################
+//############################## Plugin 200: Plantower custom sensor ####################################
 //#######################################################################################################
 //
 // self build sensor for environment, include PM2.5, PM10, CO2, HCHO, Temperature and Humidity
@@ -17,52 +17,56 @@
 * 8-byte:   low byte of CO2 (ppm)
 * 9-byte:  high byte of HCHO (ppm)
 * 10-byte:  low byte of HCHO (ppm)
-* 11-byte: high byte of Temperature (*10)
-* 12-byte:  low byte of Temperature (*10)
-* 13-byte: high byte of Humidity (*10)
-* 14-byte:  low byte of Humidity (*10)
+* 11-byte: integer byte of Temperature
+* 12-byte: decimal byte of Temperature
+* 13-byte: integer byte of Humidity
+* 14-byte: decimal byte of Humidity
 * 15-byte: high byte of chechsum
 * 16-byte:  low byte of chechsum
 *
-*
-*
 * test data: a55a000102030405060708090a0b0141
+* PM2.5 = 1
+* PM10 = 515
+* CO2 = 1029
+* HCHO = 1543
+* TEMP = 8.9
+* RH = 10.11
 */
 
 
 #include <ESPeasySerial.h>
 #include "_Plugin_Helper.h"
 
-#define PLUGIN_095
-#define PLUGIN_ID_095 95
-#define PLUGIN_NAME_095 "Environment - custom_sensor"
-#define PLUGIN_VALUENAME1_095 "PM2.5"
-#define PLUGIN_VALUENAME2_095 "PM10"
-#define PLUGIN_VALUENAME3_095 "CO2"
-#define PLUGIN_VALUENAME4_095 "HCHO"
-#define PLUGIN_VALUENAME5_095 "Temperature"
-#define PLUGIN_VALUENAME6_095 "Humidity"
+#define PLUGIN_200
+#define PLUGIN_ID_200 200
+#define PLUGIN_NAME_200 "Environment - custom_sensor"
+#define PLUGIN_VALUENAME1_200 "PM2.5"
+#define PLUGIN_VALUENAME2_200 "PM10"
+#define PLUGIN_VALUENAME3_200 "CO2"
+#define PLUGIN_VALUENAME4_200 "HCHO"
+#define PLUGIN_VALUENAME5_200 "Temperature"
+#define PLUGIN_VALUENAME6_200 "Humidity"
 
 #define CUSTOM_SENSOR_SIG1 0xa5
 #define CUSTOM_SENSOR_SIG2 0x5a
 #define CUSTOM_SENSOR_SIZE 16
 #define CUSTOM_SENSOR_VALUE_COUNT 6
 
-ESPeasySerial *P095_easySerial = nullptr;
-boolean Plugin_095_init = false;
-boolean values_received = false;
+ESPeasySerial *P200_easySerial = nullptr;
+boolean Plugin_200_init = false;
+boolean Plugin_200_values_received = false;
 
 // Read 2 bytes from serial and make an uint16 of it. Additionally calculate
 // checksum for sensor. Assumption is that there is data available, otherwise
 // this function is blocking.
-void SerialRead16(uint16_t* value, uint16_t* checksum)
+void Plugin_200_SerialRead16(uint16_t* value, uint16_t* checksum)
 {
   uint8_t data_high, data_low;
 
-  // If P095_easySerial is initialized, we are using soft serial
-  if (P095_easySerial == nullptr) return;
-  data_high = P095_easySerial->read();
-  data_low = P095_easySerial->read();
+  // If P200_easySerial is initialized, we are using soft serial
+  if (P200_easySerial == nullptr) return;
+  data_high = P200_easySerial->read();
+  data_low = P200_easySerial->read();
 
   *value = data_low;
   *value |= (data_high << 8);
@@ -85,32 +89,32 @@ void SerialRead16(uint16_t* value, uint16_t* checksum)
 #endif
 }
 
-void SerialFlush() {
-  if (P095_easySerial != nullptr) {
-    P095_easySerial->flush();
+void Plugin_200_SerialFlush() {
+  if (P200_easySerial != nullptr) {
+    P200_easySerial->flush();
   }
 }
 
-boolean PacketAvailable(void)
+boolean Plugin_200_PacketAvailable(void)
 {
-  if (P095_easySerial != nullptr) // Software serial
+  if (P200_easySerial != nullptr) // Software serial
   {
     // When there is enough data in the buffer, search through the buffer to
     // find header (buffer may be out of sync)
-    if (!P095_easySerial->available()) return false;
-    while ((P095_easySerial->peek() != CUSTOM_SENSOR_SIG1) && P095_easySerial->available()) {
-      P095_easySerial->read(); // Read until the buffer starts with the first byte of a message, or buffer empty.
+    if (!P200_easySerial->available()) return false;
+    while ((P200_easySerial->peek() != CUSTOM_SENSOR_SIG1) && P200_easySerial->available()) {
+      P200_easySerial->read(); // Read until the buffer starts with the first byte of a message, or buffer empty.
     }
-    if (P095_easySerial->available() < CUSTOM_SENSOR_SIZE) return false; // Not enough yet for a complete packet
+    if (P200_easySerial->available() < CUSTOM_SENSOR_SIZE) return false; // Not enough yet for a complete packet
   }
   return true;
 }
 
-boolean Plugin_095_process_data(struct EventStruct *event) {
+boolean Plugin_200_process_data(struct EventStruct *event) {
   uint16_t checksum = 0, checksum2 = 0;
 //  uint16_t framelength = 0;
   uint16_t packet_header = 0;
-  SerialRead16(&packet_header, &checksum); // read CUSTOM_SENSOR_SIG1 + CUSTOM_SENSOR_SIG2
+  Plugin_200_SerialRead16(&packet_header, &checksum); // read CUSTOM_SENSOR_SIG1 + CUSTOM_SENSOR_SIG2
   if (packet_header != ((CUSTOM_SENSOR_SIG1 << 8) | CUSTOM_SENSOR_SIG2)) {
     // Not the start of the packet, stop reading.
     return false;
@@ -129,8 +133,8 @@ boolean Plugin_095_process_data(struct EventStruct *event) {
 */
   uint16_t data[CUSTOM_SENSOR_VALUE_COUNT]; // byte data_low, data_high;
   for (int i = 0; i < CUSTOM_SENSOR_VALUE_COUNT; i++)
-    SerialRead16(&data[i], &checksum);
-
+    Plugin_200_SerialRead16(&data[i], &checksum);
+/*
   String log = F("CUSTOM SENSOR : PM2.5=");
   log += data[0];
   log += F(", PM10=");
@@ -140,31 +144,16 @@ boolean Plugin_095_process_data(struct EventStruct *event) {
   log += F(", HCHO=");
   log += data[3];
   log += F(", Temperature=");
-  log += data[4]/10.0;
+  log += data[4]/256 + (float(data[4]%256))/100;
   log += F(" ℃, Humidity=");
-  log += data[5]/10.0;
+  log += data[5]/256 + (float(data[5]%256))/100;
   log += F(" %");
   addLog(LOG_LEVEL_INFO, log);
-/*
-  if (loglevelActiveFor(LOG_LEVEL_DEBUG_MORE)) {
-    String log = F("PMSx003 : count/0.1L : 0.3um=");
-    log += data[6];
-    log += F(", 0.5um=");
-    log += data[7];
-    log += F(", 1.0um=");
-    log += data[8];
-    log += F(", 2.5um=");
-    log += data[9];
-    log += F(", 5.0um=");
-    log += data[10];
-    log += F(", 10um=");
-    log += data[11];
-    addLog(LOG_LEVEL_DEBUG_MORE, log);
-  }
 */
+
   // Compare checksums
-  SerialRead16(&checksum2, nullptr);
-  SerialFlush(); // Make sure no data is lost due to full buffer.
+  Plugin_200_SerialRead16(&checksum2, nullptr);
+  Plugin_200_SerialFlush(); // Make sure no data is lost due to full buffer.
   if (checksum == checksum2)
   {
     // Data is checked and good, fill in output
@@ -172,15 +161,15 @@ boolean Plugin_095_process_data(struct EventStruct *event) {
     UserVar[event->BaseVarIndex + 1] = data[1];
     UserVar[event->BaseVarIndex + 2] = data[2];
     UserVar[event->BaseVarIndex + 3] = data[3];
-    UserVar[event->BaseVarIndex + 4] = data[4]/10.0;
-    UserVar[event->BaseVarIndex + 5] = data[5]/10.0;
-    values_received = true;
+    UserVar[event->BaseVarIndex + 4] = data[4]/256 + (float(data[4]%256))/100;
+    UserVar[event->BaseVarIndex + 5] = data[5]/256 + (float(data[5]%256))/100;
+    Plugin_200_values_received = true;
     return true;
   }
   return false;
 }
 
-boolean Plugin_095(byte function, struct EventStruct *event, String& string)
+boolean Plugin_200(byte function, struct EventStruct *event, String& string)
 {
   boolean success = false;
 
@@ -188,14 +177,14 @@ boolean Plugin_095(byte function, struct EventStruct *event, String& string)
   {
     case PLUGIN_DEVICE_ADD:
       {
-        Device[++deviceCount].Number = PLUGIN_ID_095;
+        Device[++deviceCount].Number = PLUGIN_ID_200;
         Device[deviceCount].Type = DEVICE_TYPE_SERIAL_PLUS1; //DEVICE_TYPE_TRIPLE //change to triple if you want to use soft serial port, otherwise default using HW serial
                                                               //also the init part below needs to changed, too
         Device[deviceCount].VType = SENSOR_TYPE_HEXA;
         Device[deviceCount].Ports = 0;
         Device[deviceCount].PullUpOption = false;
         Device[deviceCount].InverseLogicOption = false;
-        Device[deviceCount].FormulaOption = false;
+        Device[deviceCount].FormulaOption = true;
         Device[deviceCount].ValueCount = 6;
         Device[deviceCount].SendDataOption = true;
         Device[deviceCount].TimerOption = true;
@@ -206,19 +195,25 @@ boolean Plugin_095(byte function, struct EventStruct *event, String& string)
 
     case PLUGIN_GET_DEVICENAME:
       {
-        string = F(PLUGIN_NAME_095);
+        string = F(PLUGIN_NAME_200);
         success = true;
         break;
       }
 
     case PLUGIN_GET_DEVICEVALUENAMES:
       {
-        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[0], PSTR(PLUGIN_VALUENAME1_095));
-        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[1], PSTR(PLUGIN_VALUENAME2_095));
-        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[2], PSTR(PLUGIN_VALUENAME3_095));
-        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[3], PSTR(PLUGIN_VALUENAME4_095));
-        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[4], PSTR(PLUGIN_VALUENAME5_095));
-        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[5], PSTR(PLUGIN_VALUENAME6_095));
+        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[0], PSTR(PLUGIN_VALUENAME1_200));
+        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[1], PSTR(PLUGIN_VALUENAME2_200));
+        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[2], PSTR(PLUGIN_VALUENAME3_200));
+        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[3], PSTR(PLUGIN_VALUENAME4_200));
+        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[4], PSTR(PLUGIN_VALUENAME5_200));
+        strcpy_P(ExtraTaskSettings.TaskDeviceValueNames[5], PSTR(PLUGIN_VALUENAME6_200));
+        ExtraTaskSettings.TaskDeviceValueDecimals[0] = 0;
+        ExtraTaskSettings.TaskDeviceValueDecimals[1] = 0;
+        ExtraTaskSettings.TaskDeviceValueDecimals[2] = 0;
+        ExtraTaskSettings.TaskDeviceValueDecimals[3] = 0;
+        ExtraTaskSettings.TaskDeviceValueDecimals[4] = 2; //Temperature default 2 decimals
+        ExtraTaskSettings.TaskDeviceValueDecimals[5] = 2; //Humidity default 2 decimals
         success = true;
         break;
       }
@@ -261,10 +256,10 @@ boolean Plugin_095(byte function, struct EventStruct *event, String& string)
         log += resetPin;
         addLog(LOG_LEVEL_DEBUG, log);
 
-        if (P095_easySerial != nullptr) {
+        if (P200_easySerial != nullptr) {
           // Regardless the set pins, the software serial must be deleted.
-          delete P095_easySerial;
-          P095_easySerial = nullptr;
+          delete P200_easySerial;
+          P200_easySerial = nullptr;
         }
 
         // Hardware serial is RX on 3 and TX on 1
@@ -278,9 +273,9 @@ boolean Plugin_095(byte function, struct EventStruct *event, String& string)
           log = F("CUSTOM_SENSOR: using software serial");
           addLog(LOG_LEVEL_INFO, log);
         }
-        P095_easySerial = new ESPeasySerial(rxPin, txPin, false, 96); // 96 Bytes buffer, enough for up to 3 packets.
-        P095_easySerial->begin(9600);
-        P095_easySerial->flush();
+        P200_easySerial = new ESPeasySerial(rxPin, txPin, false, 96); // 96 Bytes buffer, enough for up to 3 packets.
+        P200_easySerial->begin(9600);
+        P200_easySerial->flush();
 
         if (resetPin >= 0) // Reset if pin is configured
         {
@@ -294,17 +289,17 @@ boolean Plugin_095(byte function, struct EventStruct *event, String& string)
           pinMode(resetPin, INPUT_PULLUP);
         }
 
-        Plugin_095_init = true;
+        Plugin_200_init = true;
         success = true;
         break;
       }
 
     case PLUGIN_EXIT:
       {
-          if (P095_easySerial)
+          if (P200_easySerial)
           {
-            delete P095_easySerial;
-            P095_easySerial=nullptr;
+            delete P200_easySerial;
+            P200_easySerial=nullptr;
           }
           break;
       }
@@ -314,13 +309,13 @@ boolean Plugin_095(byte function, struct EventStruct *event, String& string)
     // sync.
     case PLUGIN_TEN_PER_SECOND:
       {
-        if (Plugin_095_init)
+        if (Plugin_200_init)
         {
           // Check if a complete packet is available in the UART FIFO.
-          if (PacketAvailable())
+          if (Plugin_200_PacketAvailable())
           {
             addLog(LOG_LEVEL_DEBUG_MORE, F("CUSTOM_SENSOR : Packet available"));
-            success = Plugin_095_process_data(event);
+            success = Plugin_200_process_data(event);
           }
         }
         break;
@@ -328,11 +323,11 @@ boolean Plugin_095(byte function, struct EventStruct *event, String& string)
     case PLUGIN_READ:
       {
         // When new data is available, return true
-        success = values_received;
-        values_received = false;
+        success = Plugin_200_values_received;
+        Plugin_200_values_received = false;
         break;
       }
   }
   return success;
 }
-//#endif // USES_P095
+#endif // USES_P200
