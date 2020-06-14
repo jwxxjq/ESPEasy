@@ -747,7 +747,7 @@ To create/register a plugin, you have to :
     #define USES_P043   // ClkOutput
 //    #define USES_P044   // P1WifiGateway
 
-//    #define USES_P049   // MHZ19
+    #define USES_P049   // MHZ19
 
 //    #define USES_P052   // SenseAir
     #define USES_P053   // PMSx003
@@ -755,6 +755,7 @@ To create/register a plugin, you have to :
 //    #define USES_P059   // Encoder
 
 //    #define USES_P063   // TTP229_KeyPad
+    #define USES_P068   // SHT3x
 //    #define USES_P073   // 7DG
 //    #define USES_P079   // Wemos Motoshield
     #define USES_P200    // custom sensor
